@@ -55,8 +55,40 @@ def draw():
     screen.draw.textbox(f"Score: {score}", score_box, color = "#FFBF00")
 
     screen.draw.textbox("question", question_box, color = "#CDE5D7", shadow = (0.5,0.5), scolor = "#ECE2D0")
+    index = 1
+    for answer_box in answer_boxes:
+        screen.draw.textbox("answer", answer_box, color = "#BB9F06")
+        index = index + 1
 
 def update():
-    pass
+    move_marquee()
+
+def move_marquee():
+    marquee_box.x = marquee_box.x - 2
+    if marquee_box.right < 0:
+        marquee_box.left = WIDTH
+
+def read_question_file():
+    global question_count, questions
+    q_file = open(question_file_name, "r")
+    for question in q_file:
+        questions.append(question)
+        question_count = question_count + 1
+    q_file.close()
+
+def read_next_question():
+    global question_index
+    question_index = question_index + 1
+    return questions.pop(0).split(",")
+
+def on_mouse_down(pos):
+    index = 1
+    for answer_box in answer_boxes:
+        if answer_box.collidepoint(pos):
+            if index == int(question[5]):
+                correct_answer()
+
+
+
 
 pgzrun.go()
