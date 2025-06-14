@@ -19,6 +19,7 @@ timer_left = 10
 marquee_msg = ""
 question_file_name = "questions.txt"
 is_game_over = False
+msg = ""
 
 answer_boxes = [ans_box1,ans_box2,ans_box3,ans_box4]
 questions = []
@@ -54,10 +55,10 @@ def draw():
     screen.draw.textbox(f"{timer_left}", timer_box, color = "#CCA43B", shadow = (0.5,0.5), scolor = "#DBEBC0")
     screen.draw.textbox(f"Score: {score}", score_box, color = "#FFBF00")
 
-    screen.draw.textbox("question", question_box, color = "#CDE5D7", shadow = (0.5,0.5), scolor = "#ECE2D0")
+    screen.draw.textbox(question[0].strip(), question_box, color = "#CDE5D7", shadow = (0.5,0.5), scolor = "#ECE2D0")
     index = 1
     for answer_box in answer_boxes:
-        screen.draw.textbox("answer", answer_box, color = "#BB9F06")
+        screen.draw.textbox(question[index].strip(), answer_box, color = "#BB9F06")
         index = index + 1
 
 def update():
@@ -87,6 +88,47 @@ def on_mouse_down(pos):
         if answer_box.collidepoint(pos):
             if index == int(question[5]):
                 correct_answer()
+            else:
+                game_over()
+        index = index + 1
+    if skip_box.collidepoint(pos):
+        skip_question()
+
+def correct_answer():
+    global score, question, timer_left, questions
+    score = score + 1
+    if questions:
+        question = read_next_question()
+        timer_left = 10
+    else:
+        game_over()
+
+def game_over():
+    global question, timer_left, is_game_over, msg
+    msg = f"GAME OVER! you answered {score} questions correctly!"
+    question = [msg, "-", "-", "-", "-", 5]
+    timer_left = 0
+    is_game_over = True
+
+def skip_question():
+    global question, timer_left
+    if questions and not is_game_over:
+        question = read_next_question()
+        timer_left = 10
+    else:
+        game_over()
+
+def update_time():
+    global timer_left
+    if timer_left:
+        timer_left = timer_left - 1
+    else:
+        game_over()
+
+read_question_file()
+question = read_next_question()
+clock.schedule_interval(update_time, 1)
+
 
 
 
